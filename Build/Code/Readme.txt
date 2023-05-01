@@ -1,0 +1,1 @@
+This is a simple text file to help set up Git and Rstudio
