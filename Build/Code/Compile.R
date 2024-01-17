@@ -171,7 +171,7 @@ names(core) <- c("Cust.Date", "Type","Appr.Date", "Next","Class", "ID")
 parole<-core %>%
   distinct(.keep_all=TRUE)
 
-save(parole, file="./Build/Output/infractions.RData")
+save(parole, file="./Build/Output/par_rel.RData")
 
 #Work Assignment Data
 
