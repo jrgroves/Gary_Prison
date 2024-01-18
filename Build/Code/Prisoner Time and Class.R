@@ -32,17 +32,30 @@ rel <- parole %>%
   filter(period != 0)     #This removes cases where we have the exit date, but not entry date for that period
 
 #Merging with prisoner classification data
-
 temp <- class %>%
-  mutate(Class.Date = as.Date(Date, format="%m/%d/%Y"),
-         Date = Class.Date - 1) %>%
-  right_join(rel, ., by=c("ID", "Date")) %>%
-  filter(!is.na(Type))
-
-temp2 <- class %>%
   mutate(Date = as.Date(Date, format="%m/%d/%Y")) %>%
-  right_join(rel, ., by=c("ID", "Date")) %>%
-  filter(!is.na(Type))
+  arrange(ID, Date) %>%
+  group_by(ID) %>%
+  mutate(IDNUM = paste(ID, row_number(), sep="."))
+
+
+temp2 <- rel %>%
+  select(ID, Date, Class, IN, period, dur) %>%
+  full_join(., temp, by=c("ID", "Date")) %>%
+  arrange(ID, Date) 
+
+
+temp3 <- temp2 %>%
+  group_by(ID) %>%
+  arrange(ID, Date) %>%
+  mutate(Date2 = lead(Date),
+         Class = lead(Class.y),
+         IDNUM.p = lead(IDNUM)) %>%
+  filter(Class == "INITIAL CL." & !is.na(IN)) %>%
+  mutate(d = as.numeric(Date2 - Date)) %>%
+  filter(d < 22) %>%     #The removes any case where the date for the classification was more than three weeks from the date of entry.
+  ungroup(ID) %>%
+  select(IDNUM.p, d)
 
 
 
